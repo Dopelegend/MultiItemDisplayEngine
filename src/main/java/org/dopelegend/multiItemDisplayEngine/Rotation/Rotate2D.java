@@ -25,13 +25,15 @@ public class Rotate2D {
      * @param angle The angle that the object should be at compared to the center, in degrees (360).
      * @param centerOfRotation The point the object should be rotated around
      * @param object The object that is rotated
+     * @param offset The offset the returned location should have in degrees (360)
+     *
      * @return The Location
      */
-    public static Location SetRotation(double angle, Location centerOfRotation, Location object) {
+    public static Location SetRotation(double angle, Location centerOfRotation, Location object, double offset) {
         angle = Math.toRadians(angle);
         double radius = Math.sqrt(Math.pow((centerOfRotation.getX()-object.getX()), 2) + Math.pow((centerOfRotation.getZ()-object.getZ()), 2));
         centerOfRotation.getWorld().sendMessage(Component.text(String.valueOf(radius)));
-        double offset = Math.toRadians(90);
+        offset = Math.toRadians(offset);
         object.setX(centerOfRotation.getX()+Math.cos(angle+offset)*radius);
         object.setZ(centerOfRotation.getZ()+Math.sin(angle+offset)*radius);
         object.setYaw((float) (Math.toDegrees(angle)));

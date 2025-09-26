@@ -3,6 +3,9 @@ package org.dopelegend.multiItemDisplayEngine.Rotation;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.ItemDisplay;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public class Rotate3D {
     /**
@@ -14,7 +17,7 @@ public class Rotate3D {
      * @return Returns the new location of the object
      */
     public static Location SetRotation(double yaw, double pitch , Location centerOfRotation, Location object) {
-        Location rotatedLoc = Rotate2D.SetRotation(yaw, centerOfRotation, object);
+        Location rotatedLoc = Rotate2D.SetRotation(yaw, centerOfRotation, object, 0);
         double relativeZ = rotatedLoc.getZ() - centerOfRotation.getZ();
         double relativeX = rotatedLoc.getX() - centerOfRotation.getX();
         double relativeY = rotatedLoc.getY() - centerOfRotation.getY();
@@ -55,5 +58,52 @@ public class Rotate3D {
         object.setZ(centerOfRotation.getZ()+Math.cos(totalPitch)*radius*sinZYaw);
         object.setY(centerOfRotation.getY()+Math.sin(totalPitch)*radius);
         return object;
+    }
+
+    //ChatGPT
+
+    /**
+     * Rotates an ItemDisplay around a center point in 3D.
+     *
+     * @param display   The ItemDisplay to rotate
+     * @param center    The rotation center
+     * @param yawDeg    Rotation around Y axis (in degrees)
+     * @param pitchDeg  Rotation around X axis (in degrees)
+     * @param rollDeg   Rotation around Z axis (in degrees)
+     */
+    public static Location rotateAroundCenter(ItemDisplay display, Location center,
+                                          double yawDeg, double pitchDeg, double rollDeg) {
+        Location loc = display.getLocation();
+
+        // Vector from center to display
+        Vector3f rel = new Vector3f(
+                (float)(loc.getX() - center.getX()),
+                (float)(loc.getY() - center.getY()),
+                (float)(loc.getZ() - center.getZ())
+        );
+
+        // Convert to radians
+        float yawRad   = (float) Math.toRadians(yawDeg);
+        float pitchRad = (float) Math.toRadians(pitchDeg);
+        float rollRad  = (float) Math.toRadians(rollDeg);
+
+        // Build rotation matrix
+        Matrix4f rot = new Matrix4f()
+                .rotateY(yawRad)    // yaw
+                .rotateX(pitchRad)  // pitch
+                .rotateZ(rollRad);  // roll
+
+        // Apply rotation
+        rel.mulPosition(rot);
+
+        // New world position = center + rotated vector
+        Vector3f newPos = new Vector3f(
+                (float) center.getX(),
+                (float) center.getY(),
+                (float) center.getZ()
+        ).add(rel);
+
+        loc.set(newPos.x, newPos.y, newPos.z);
+        return loc;
     }
 }
