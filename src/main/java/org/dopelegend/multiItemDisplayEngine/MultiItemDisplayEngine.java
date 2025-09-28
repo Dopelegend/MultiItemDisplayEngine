@@ -1,53 +1,26 @@
     package org.dopelegend.multiItemDisplayEngine;
 
-    import org.bukkit.*;
-    import org.bukkit.block.data.BlockData;
-    import org.bukkit.entity.*;
-    import org.bukkit.inventory.ItemStack;
+    import org.bukkit.plugin.Plugin;
     import org.bukkit.plugin.java.JavaPlugin;
-    import org.dopelegend.multiItemDisplayEngine.ItemDisplay.Utils.ItemDisplayGroups.ItemDisplayGroup;
 
-    import java.util.List;
+    import java.io.File;
 
     public final class MultiItemDisplayEngine extends JavaPlugin {
 
+        public static File modelFolder;
+        public static Plugin plugin;
+
         @Override
         public void onEnable() {
-            // Plugin startup logic
+            if (!getDataFolder().exists()) {
+                getDataFolder().mkdirs();
+            }
+            plugin = this;
 
-            // 3d rotation test
-    //        Location centerLoc = new Location(Bukkit.getWorlds().getFirst(), 0, 100, 0);
-    //        Location displaySpawnLoc = centerLoc.clone().add(0, 0, 5);
-    //        ItemDisplay itemDisplay = (ItemDisplay) displaySpawnLoc.getWorld().spawnEntity(displaySpawnLoc, EntityType.ITEM_DISPLAY);
-    //        itemDisplay.setItemStack(new ItemStack(Material.STONE));
-    //
-    //        Bukkit.getScheduler().runTaskTimer(this, () -> {
-    //            itemDisplay.setTeleportDuration(5);
-    //            itemDisplay.teleport(Rotate3D.AddRotation(Math.toRadians(2), Math.toRadians(2), centerLoc, displaySpawnLoc));
-    //        }, 0, 5);
-
-            World world = Bukkit.getWorlds().getFirst();
-            Location centerLoc = new Location(world, 0, 100, 0);
-            ItemDisplay baseItemDisplay = (ItemDisplay) world.spawnEntity(centerLoc.clone().add(0, 0, 1), EntityType.ITEM_DISPLAY);
-            baseItemDisplay.setItemStack(new ItemStack(Material.STONE));
-
-            List<ItemDisplay> itemDisplays = List.of(
-                    baseItemDisplay,
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(1, 0, 0)),
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(1, 0, 1)),
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(-1, 0, 0)),
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(0, 0, -1)),
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(-1, 0, -1)),
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(1, 0, -1)),
-                    (ItemDisplay) baseItemDisplay.copy(centerLoc.clone().add(-1, 0, 1))
-            );
-            String name = "MultiItemDisplay";
-            ItemDisplayGroup itemDisplayGroup = new ItemDisplayGroup(centerLoc, itemDisplays, name);
-
-
-            Bukkit.getScheduler().runTaskTimer(this, () -> {
-                itemDisplayGroup.AddRotation2D(2,  2);
-            }, 10,  2);
+            modelFolder = new File(getDataFolder(), "Models");
+            if (!modelFolder.exists()) {
+                modelFolder.mkdirs();
+            }
         }
 
         @Override

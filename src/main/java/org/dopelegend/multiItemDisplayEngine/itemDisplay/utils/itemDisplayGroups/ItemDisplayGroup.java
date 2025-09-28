@@ -1,10 +1,10 @@
-package org.dopelegend.multiItemDisplayEngine.ItemDisplay.Utils.ItemDisplayGroups;
+package org.dopelegend.multiItemDisplayEngine.itemDisplay.utils.itemDisplayGroups;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ItemDisplay;
-import org.dopelegend.multiItemDisplayEngine.Rotation.Rotate2D;
-import org.dopelegend.multiItemDisplayEngine.Rotation.Rotate3D;
+import org.dopelegend.blockBench.Bone;
+import org.dopelegend.multiItemDisplayEngine.rotation.Rotate2D;
+import org.dopelegend.multiItemDisplayEngine.rotation.Rotate3D;
 
 import java.util.List;
 
@@ -40,6 +40,8 @@ public class ItemDisplayGroup {
         this.yaw = 0;
         this.pitch = 0;
         this.roll = 0;
+
+
     }
 
     public double GetYaw() {
@@ -77,5 +79,8 @@ public class ItemDisplayGroup {
             itemDisplay.setTeleportDuration(ticks);
             itemDisplay.teleport(Rotate3D.rotateAroundCenter(itemDisplay, this.centerOfRotation, yaw, pitch, roll));
         }
+    }
+    public void RunAnimation(String animationName, boolean loop, double speed) {
+
     }
 }

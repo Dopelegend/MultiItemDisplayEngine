@@ -1,4 +1,4 @@
-package org.dopelegend.multiItemDisplayEngine.ItemDisplay.Utils;
+package org.dopelegend.multiItemDisplayEngine.itemDisplay.utils;
 
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.util.Transformation;

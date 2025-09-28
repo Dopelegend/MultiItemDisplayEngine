@@ -1,4 +1,4 @@
-package org.dopelegend.multiItemDisplayEngine.Rotation;
+package org.dopelegend.multiItemDisplayEngine.rotation;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
