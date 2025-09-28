@@ -1,11 +1,8 @@
     package org.dopelegend.multiItemDisplayEngine;
 
-    import org.bukkit.Bukkit;
-    import org.bukkit.Location;
-    import org.bukkit.Material;
-    import org.bukkit.World;
-    import org.bukkit.entity.EntityType;
-    import org.bukkit.entity.ItemDisplay;
+    import org.bukkit.*;
+    import org.bukkit.block.data.BlockData;
+    import org.bukkit.entity.*;
     import org.bukkit.inventory.ItemStack;
     import org.bukkit.plugin.java.JavaPlugin;
     import org.dopelegend.multiItemDisplayEngine.ItemDisplay.Utils.ItemDisplayGroups.ItemDisplayGroup;
@@ -49,7 +46,7 @@
 
 
             Bukkit.getScheduler().runTaskTimer(this, () -> {
-                itemDisplayGroup.SetRotation3D(1, 0, 0, 0);
+                itemDisplayGroup.AddRotation2D(2,  2);
             }, 10,  2);
         }
 

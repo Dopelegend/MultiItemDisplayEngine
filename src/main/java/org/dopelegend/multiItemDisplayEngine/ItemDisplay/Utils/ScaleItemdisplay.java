@@ -5,6 +5,7 @@ import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 public class ScaleItemdisplay {
+
     public static void AddSize(ItemDisplay itemDisplay, float x, float y, float z){
         Transformation itemDisplayTransformation = itemDisplay.getTransformation();
         Vector3f itemDisplayTransformationScale = itemDisplayTransformation.getScale().add(x, y, z);
@@ -14,6 +15,7 @@ public class ScaleItemdisplay {
                 itemDisplayTransformation.getRightRotation());
         itemDisplay.setTransformation(newItemDisplayTransformation);
     }
+
     public static void SetSize(ItemDisplay itemDisplay, float x, float y, float z){
         Transformation itemDisplayTransformation = itemDisplay.getTransformation();
         Transformation newItemDisplayTransformation = new Transformation(itemDisplayTransformation.getTranslation(),
