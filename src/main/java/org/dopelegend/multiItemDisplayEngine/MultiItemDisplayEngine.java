@@ -2,6 +2,7 @@
 
     import org.bukkit.plugin.Plugin;
     import org.bukkit.plugin.java.JavaPlugin;
+    import org.dopelegend.multiItemDisplayEngine.commands.CommandListener;
 
     import java.io.File;
 
@@ -21,6 +22,7 @@
             if (!modelFolder.exists()) {
                 modelFolder.mkdirs();
             }
+            new CommandListener(this);
         }
 
         @Override
