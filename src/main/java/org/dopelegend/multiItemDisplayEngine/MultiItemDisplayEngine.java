@@ -2,10 +2,10 @@
 
     import org.bukkit.plugin.Plugin;
     import org.bukkit.plugin.java.JavaPlugin;
+    import org.dopelegend.multiItemDisplayEngine.blockBench.generator.TexturePack;
     import org.dopelegend.multiItemDisplayEngine.commands.CommandListener;
     import org.dopelegend.multiItemDisplayEngine.files.generate.FileStructure;
 
-    import java.io.File;
 
     public final class MultiItemDisplayEngine extends JavaPlugin {
 
@@ -13,9 +13,10 @@
 
         @Override
         public void onEnable() {
-            FileStructure.generateEntireFileStructure();
             plugin = this;
+            FileStructure.generateEntireFileStructure();
             new CommandListener(this);
+            TexturePack.generateTexturePack();
         }
 
         @Override

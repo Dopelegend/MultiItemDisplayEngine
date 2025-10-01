@@ -17,7 +17,7 @@ public class FileGetter {
      * @return The model folder or null if none exists
      */
     public static File getModelFolder (){
-        if(!modelFolder.exists()){
+        if(modelFolder == null) {
             modelFolder = new File(MultiItemDisplayEngine.plugin.getDataFolder(), "Models");
         }
         return modelFolder;
@@ -30,7 +30,7 @@ public class FileGetter {
      * @return The texturepack folder or null if none exists
      */
     public static File getTexturePackFolder (){
-        if(!texturePackFolder.exists()){
+        if(texturePackFolder == null) {
             texturePackFolder = new File(MultiItemDisplayEngine.plugin.getDataFolder(), "TexturePacks");
         }
         return texturePackFolder;
@@ -42,8 +42,8 @@ public class FileGetter {
      *
      * @return The tempfolder or null if none exists
      */
-    public static File getTempFolder (){
-        if(!tempFolder.exists()){
+    public static File getTempFolder () {
+        if(tempFolder == null){
             tempFolder = new File(MultiItemDisplayEngine.plugin.getDataFolder(), "Temp");
         }
         return tempFolder;
