@@ -20,9 +20,14 @@ public class CommandListener {
 
     private LiteralCommandNode<CommandSourceStack> modelCommand(){
         return Commands.literal("model")
+                .requires(ctx -> ctx.getSender().isOp())
                 .then(Commands.literal("spawn")
                         .then(Commands.argument("model name", StringArgumentType.greedyString()).executes(ModelCommand::spawnModelByNameCommand)
                         )
-                ).build();
+                )
+                .then(Commands.literal("texturepack")
+                        .then(Commands.literal("generate")
+                                .executes(ModelCommand::generateTexturePack)))
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package org.dopelegend.multiItemDisplayEngine.blockBench;
 
 import com.google.gson.*;
 import org.dopelegend.multiItemDisplayEngine.MultiItemDisplayEngine;
+import org.dopelegend.multiItemDisplayEngine.files.utils.FileGetter;
 import org.dopelegend.multiItemDisplayEngine.utils.classes.Triple;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class FileReader {
      * @return found model file or null if none was found.
      */
     public static File getModelFile(String path) {
-        File file = new File(MultiItemDisplayEngine.modelFolder, path + ".bbmodel");
+        File file = new File(FileGetter.getModelFolder(), path + ".bbmodel");
         if(!file.exists()){
             MultiItemDisplayEngine.plugin.getLogger().warning("The model file could not be found: " + path + ".bbmodel");
             return null;

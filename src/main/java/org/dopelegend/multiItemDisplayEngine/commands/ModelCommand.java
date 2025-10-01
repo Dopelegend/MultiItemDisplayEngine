@@ -16,4 +16,13 @@ public class ModelCommand {
         itemDisplayGroup.Spawn();
         return 1;
     }
+
+    public static int generateTexturePack(CommandContext<CommandSourceStack> ctx) {
+        if (!(ctx.getSource().getSender() instanceof Player)){
+            ctx.getSource().getSender().sendRichMessage("<red> <bold> Only players can execute this command");
+            return 0;
+        }
+
+        return 1;
+    }
 }
