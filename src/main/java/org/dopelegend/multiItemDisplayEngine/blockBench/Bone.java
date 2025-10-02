@@ -7,6 +7,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.dopelegend.multiItemDisplayEngine.itemDisplay.utils.itemDisplayGroups.ItemDisplayGroup;
+import org.dopelegend.multiItemDisplayEngine.utils.CustomModelData;
 import org.dopelegend.multiItemDisplayEngine.utils.classes.Triple;
 
 import java.util.ArrayList;
@@ -75,8 +76,13 @@ public class Bone {
                     originPosition.z + this.offset.z / 16
             );
 
+            //Spawn item display
             this.itemDisplay = (ItemDisplay) world.spawnEntity(new Location(world, spawnPosition.x, spawnPosition.y, spawnPosition.z), EntityType.ITEM_DISPLAY);
-            this.itemDisplay.setItemStack(new ItemStack(Material.DIAMOND_BLOCK));
+
+            ItemStack itemDisplayItem = new ItemStack(Material.DIAMOND_BLOCK);
+            //Set Custom Model Data
+            itemDisplayItem = CustomModelData.addCustomModelData(this.UUID, itemDisplayItem);
+            this.itemDisplay.setItemStack(itemDisplayItem);
         }
         for(int i = 0; i < this.childrenBones.size(); i++){
             this.childrenBones.get(i).spawn(originPosition, world);

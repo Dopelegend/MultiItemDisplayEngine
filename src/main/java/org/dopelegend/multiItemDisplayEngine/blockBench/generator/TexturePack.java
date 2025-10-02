@@ -10,6 +10,9 @@ import org.dopelegend.multiItemDisplayEngine.utils.classes.Triple;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -61,6 +64,18 @@ public class TexturePack {
             MultiItemDisplayEngine.plugin.getLogger().warning(Arrays.toString(e.getStackTrace()));
             return false;
         }
+
+        //DEV
+        try {
+            Files.delete(Path.of("C:\\Users\\tenna\\AppData\\Roaming\\.minecraft\\resourcepacks\\" + texturePackName));
+            Path textFolder = Paths.get("C:\\Users\\tenna\\AppData\\Roaming\\.minecraft\\resourcepacks");
+            Files.move(workingDir.toPath(), textFolder.resolve(workingDir.getName()));
+        } catch (Exception e){
+            MultiItemDisplayEngine.plugin.getLogger().warning(e.getMessage());
+            MultiItemDisplayEngine.plugin.getLogger().warning(Arrays.toString(e.getStackTrace()));
+            return  false;
+        }
+
         //deleteTexturepackFolder(workingDir);
         return true;
     }
@@ -121,7 +136,7 @@ public class TexturePack {
             // Fallback object
             JsonObject fallback = new JsonObject();
             fallback.addProperty("type", "model");
-            fallback.addProperty("model", "block/diamond");
+            fallback.addProperty("model", "block/diamond_block");
 
             // Model object
             JsonObject model = new JsonObject();
@@ -139,7 +154,7 @@ public class TexturePack {
             String json = gson.toJson(root);
 
             // Write to file
-            File file = new File(workingDir, "assets/minecraft/items/diamond.json");
+            File file = new File(workingDir, "assets/minecraft/items/diamond_block.json");
             file.getParentFile().mkdirs();
             Files.writeString(file.toPath(), json);
         }catch (Exception e){
@@ -163,7 +178,10 @@ public class TexturePack {
         }
         //Loop through all bones (one bone = one json file)
         for (Pair<JsonObject, JsonObject> boneAndJsonRootPair : allBones) {
-            //Todo skip if no elements in bone
+            JsonObject[] bbFileElements = getAllElementsFromBone(boneAndJsonRootPair.right(), boneAndJsonRootPair.left());
+            if(bbFileElements.length==0){
+                continue;
+            }
             //Get uuid
             String uuid = boneAndJsonRootPair.left().get("uuid").getAsString();
 
@@ -186,7 +204,6 @@ public class TexturePack {
             texturesObject.addProperty("-1", "block/diamond_block");
 
             JsonObject[] textures = getAllTexture(boneAndJsonRootPair.right());
-            JsonObject[] bbFileElements = getAllElementsFromBone(boneAndJsonRootPair.right(), boneAndJsonRootPair.left());
 
             // known ids so we don't duplicate entries
             List<Integer> knownIds = new ArrayList<>();
@@ -217,69 +234,54 @@ public class TexturePack {
                     for (JsonObject texture : textures){
                         if(texture.get("id").getAsInt() == id){
                             // add texture to texturesObject and known ids
-                            texturesObject.addProperty(String.valueOf(id), "item/" + texture.get("uuid"));
+                            texturesObject.addProperty(String.valueOf(id), "item/" + texture.get("uuid").getAsString());
                             knownIds.add(id);
                         }
                     }
                 }
             }
             rootJson.add("textures", texturesObject);
-
-            JsonObject firstElement = null;
-            // Get first element
-            Optional<JsonObject> optionalFirstElement = Arrays.stream(bbFileElements).findFirst();
-            //Check if firstElement exists
-            if(optionalFirstElement.isPresent()){
-                //Set first element if it exists
-                firstElement = optionalFirstElement.get();
-            }
-            Triple firstElementFrom = new Triple(0, 0, 0);
-            // Check if first element is set
-            if (firstElement!=null){
-                //get first the first element's from if it exists
-                firstElementFrom.setX(firstElement.get("from").getAsJsonArray().get(0).getAsDouble());
-                firstElementFrom.setY(firstElement.get("from").getAsJsonArray().get(1).getAsDouble());
-                firstElementFrom.setZ(firstElement.get("from").getAsJsonArray().get(2).getAsDouble());
-            }
+            JsonObject firstElement = bbFileElements[0];
+            JsonArray firstElementFromArray = firstElement.get("from").getAsJsonArray();
+            int j = 0;
 
             // Make elements Array
             JsonArray elements = new JsonArray();
-            // Make isFirst bool
-            boolean isFirst = true;
+
             //Loop through all elements in bone
             for (JsonObject bbElement : bbFileElements) {
+
                 //Create element
-                JsonObject element = new JsonObject();
+               JsonObject element = new JsonObject();
 
                 //Add name property
                 element.addProperty("name", bbElement.get("uuid").getAsString());
-                //Make "from" JsonArray
+                //----------------------------------
+                //              TEMP
+                //----------------------------------
+                JsonArray toArray = new JsonArray();
                 JsonArray fromArray = new JsonArray();
-                //Check if this isn't the first from value
-                if (!isFirst){
-                    //Add coordinates - first from coordinates if this isn't the first from value.
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble()-firstElementFrom.x);
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble()-firstElementFrom.y);
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble()-firstElementFrom.z);
-                }
+                if(j == 0){
+                    toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble());
+                    toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble());
+                    toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble());
 
-                else {
-                    //Add coordinates without subtracting if this is the first value.
                     fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble());
                     fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble());
                     fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble());
+                }else{
+                    toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble() - firstElementFromArray.get(0).getAsDouble());
+                    toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble() - firstElementFromArray.get(1).getAsDouble());
+                    toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble() - firstElementFromArray.get(2).getAsDouble());
+
+                    fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble() - firstElementFromArray.get(0).getAsDouble());
+                    fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble() - firstElementFromArray.get(1).getAsDouble());
+                    fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble() - firstElementFromArray.get(2).getAsDouble());
                 }
 
-                //Add fromArray
-                element.add("from", fromArray);
+                //----------------------------------
 
-                //Make toArray
-                JsonArray toArray = new JsonArray();
-                // Add values to it, by getting the values from bbElement and subtracting the firstElement's from values
-                toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble()- firstElementFrom.x);
-                toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble()- firstElementFrom.y);
-                toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble()- firstElementFrom.z);
-                //Add toArray
+                element.add("from", fromArray);
                 element.add("to", toArray);
 
                 // Rotation
@@ -293,7 +295,11 @@ public class TexturePack {
 
                     for (int i = 0; i < rotationArray.size(); i++) {
                         int rot = rotationArray.get(i).getAsInt();
-                        if(rot > 0) rotAngle = rot;
+                        if(rot > 0){
+                            rotAngle = rot;
+                            if(i == 1) rotAxis = 'y';
+                            if(i == 2) rotAxis = 'z';
+                        }
                     }
                 }
 
@@ -308,10 +314,17 @@ public class TexturePack {
 
                 for(String direction : directions){
                     JsonObject face = new JsonObject();
-                    face.add("uv", bbElement
+                    int resSize = 16;
+                    JsonArray uvArray = bbElement
                             .get("faces").getAsJsonObject()
                             .get(direction).getAsJsonObject()
-                            .get("uv").getAsJsonArray());
+                            .get("uv").getAsJsonArray();
+
+                    for (int i = 0; i < uvArray.size(); i++) {
+                        JsonElement uv = new JsonPrimitive(uvArray.get(i).getAsFloat()/(bbModelResolutionSize.get("width").getAsFloat() / resSize));
+                        uvArray.set(i, uv);
+                    }
+                    face.add("uv", uvArray);
 
                     boolean hasTexture = bbElement
                             .get("faces").getAsJsonObject()
@@ -416,7 +429,7 @@ public class TexturePack {
 
     /**
      *
-     * Gets all imidiate children elements from a bone
+     * Gets all immediate children elements from a bone
      *
      * @param modelData The root JsonObject in model file
      * @param bone The bone that is going to be searched
@@ -472,6 +485,7 @@ public class TexturePack {
             }
             JsonArray boneArray = modelData.get("outliner").getAsJsonArray();
             JsonObject rootBone = boneArray.get(0).getAsJsonObject();
+            bones.add(rootBone);
             bones.addAll(Arrays.stream(getChildBones(rootBone)).toList());
         }
         return bones.toArray(new JsonObject[0]);
@@ -499,6 +513,7 @@ public class TexturePack {
             }
             JsonArray boneArray = modelData.get("outliner").getAsJsonArray();
             JsonObject rootBone = boneArray.get(0).getAsJsonObject();
+            bonesAndRootJson.add(Pair.of(rootBone, modelData));
             bonesAndRootJson.addAll(getChildBonesWithRootJson(rootBone, modelData));
         }
         return bonesAndRootJson;
