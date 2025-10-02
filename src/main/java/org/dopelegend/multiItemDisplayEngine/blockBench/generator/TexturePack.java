@@ -241,9 +241,6 @@ public class TexturePack {
                 }
             }
             rootJson.add("textures", texturesObject);
-            JsonObject firstElement = bbFileElements[0];
-            JsonArray firstElementFromArray = firstElement.get("from").getAsJsonArray();
-            int j = 0;
 
             // Make elements Array
             JsonArray elements = new JsonArray();
@@ -261,23 +258,14 @@ public class TexturePack {
                 //----------------------------------
                 JsonArray toArray = new JsonArray();
                 JsonArray fromArray = new JsonArray();
-                if(j == 0){
-                    toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble());
-                    toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble());
-                    toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble());
 
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble());
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble());
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble());
-                }else{
-                    toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble() - firstElementFromArray.get(0).getAsDouble());
-                    toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble() - firstElementFromArray.get(1).getAsDouble());
-                    toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble() - firstElementFromArray.get(2).getAsDouble());
+                toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble());
+                toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble());
+                toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble());
 
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble() - firstElementFromArray.get(0).getAsDouble());
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble() - firstElementFromArray.get(1).getAsDouble());
-                    fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble() - firstElementFromArray.get(2).getAsDouble());
-                }
+                fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble());
+                fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble());
+                fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble());
 
                 //----------------------------------
 
