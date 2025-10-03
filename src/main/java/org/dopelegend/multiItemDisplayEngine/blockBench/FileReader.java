@@ -3,6 +3,7 @@ package org.dopelegend.multiItemDisplayEngine.blockBench;
 import com.google.gson.*;
 import org.dopelegend.multiItemDisplayEngine.MultiItemDisplayEngine;
 import org.dopelegend.multiItemDisplayEngine.files.utils.FileGetter;
+import org.dopelegend.multiItemDisplayEngine.utils.Uuid;
 import org.dopelegend.multiItemDisplayEngine.utils.classes.Triple;
 
 import java.io.File;
@@ -72,7 +73,7 @@ public class FileReader {
         //Get rootBone
 
         JsonObject boneObject = modelData.getAsJsonArray("outliner").get(0).getAsJsonObject();
-        return createBone(boneObject, modelData, null);
+        return createBone(boneObject, null, modelData);
     }
 
 
@@ -80,73 +81,50 @@ public class FileReader {
      *
      * Gets a bone from a json bone object and the parent bone, use parent bone null for root bones. This function iterates over itself to create child bones.
      *
-     * @param modelData Json object of the model file
+     * @param outlinerObject The jsonObject of the outliner
      * @param parent Parent bone
      * @return Created bone
      */
-    static private Bone createBone(JsonObject boneObject, JsonObject modelData, Bone parent){
-        JsonArray originArray = boneObject.getAsJsonArray("origin");
-        JsonArray childrenArray = boneObject.getAsJsonArray("children");
+    static private Bone createBone(JsonObject outlinerObject, Bone parent, JsonObject rootJson){
+        JsonArray originArray = outlinerObject.getAsJsonArray("origin");
+        JsonArray childrenArray = outlinerObject.getAsJsonArray("children");
 
-        //Finds the uuid of the first element in the children of the bone, or null if it has none
-        String uuid = null;
+        List<String> uuids = new ArrayList<>();
+        List<Element> elements = new ArrayList<>();
         for(int i = 0; i < childrenArray.size(); i++){
             Object object = childrenArray.get(i);
             if(!(object instanceof JsonObject)){
-                uuid = childrenArray.get(i).getAsString();
-                break;
+                uuids.add(childrenArray.get(i).getAsString());
             }
         }
 
-        Bone bone = null;
-        if(uuid == null){
-            bone = new Bone(
-                    new Triple(originArray.get(0).getAsDouble(), originArray.get(1).getAsDouble(),originArray.get(2).getAsDouble()),
-                    parent,
-                    new ArrayList<>(),
-                    boneObject.get("uuid").getAsString()
-            );
-        }else{
-            JsonArray elementPos = Objects.requireNonNull(getElement(modelData.get("elements").getAsJsonArray(), uuid)).getAsJsonArray("from");
-            bone = new Bone(
-                    new Triple(originArray.get(0).getAsDouble(), originArray.get(1).getAsDouble(),originArray.get(2).getAsDouble()),
-                    new Triple(elementPos.get(0).getAsDouble(), elementPos.get(1).getAsDouble(), elementPos.get(2).getAsDouble()),
-                    parent,
-                    new ArrayList<>(),
-                    boneObject.get("uuid").getAsString()
-            );
+        for(String uuid : uuids){
+            elements.add(Element.getElementFromUuid(rootJson, uuid));
         }
+
+
+        Element[] childrenElementArray = elements.toArray((new Element[0]));
+        Bone bone = new Bone(
+                new Triple(originArray.get(0).getAsDouble(), originArray.get(1).getAsDouble(),originArray.get(2).getAsDouble()),
+                parent,
+                new Bone[0],
+                childrenElementArray,
+                Uuid.getStringUuid());
 
 
         //Create children bones
 
+        List<Bone> childrenBones = new ArrayList<Bone>();
         for(int i = 0; i < childrenArray.size(); i++){
             Object object = childrenArray.get(i);
             if(!(object instanceof JsonObject)){
                 continue;
             }
-            bone.addChildrenBone(createBone(childrenArray.get(i).getAsJsonObject(), modelData, bone));
+            childrenBones.add(createBone(childrenArray.get(i).getAsJsonObject(), bone, rootJson));
         }
+        Bone[] childrenBoneArray = childrenBones.toArray((new Bone[0]));
+        bone.setChildrenBone(childrenBoneArray);
 
         return bone;
-    }
-
-    /**
-     *
-     * @param elements The jsonArray of elements from the .bbmodel file.
-     * @param uuid The uuid of the element to find
-     * @return The element if it exists, or null if it doesn't
-     */
-    static private JsonObject getElement(JsonArray elements, String uuid){
-        JsonObject element;
-        String currentUUID;
-        for(int i = 0; i < elements.size(); i++){
-            currentUUID =  elements.get(i).getAsJsonObject().get("uuid").getAsString();
-            if(currentUUID.equals(uuid)){
-                element = elements.get(i).getAsJsonObject();
-                return element;
-            }
-        }
-        return null;
     }
 }

@@ -6,6 +6,8 @@
     import org.dopelegend.multiItemDisplayEngine.commands.CommandListener;
     import org.dopelegend.multiItemDisplayEngine.files.generate.FileStructure;
 
+    import javax.swing.text.html.parser.Entity;
+
 
     public final class MultiItemDisplayEngine extends JavaPlugin {
 

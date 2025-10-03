@@ -23,69 +23,37 @@ import java.util.List;
 public class Bone {
 
     Triple relPivot;
-    Triple offset;
 
     private String UUID = "";
-    private ItemDisplay itemDisplay;
-    private List<Bone> childrenBones;;
+    private Element[] elements;
+    private Bone[] childrenBones;
     private Bone parentBone;
 
     boolean hasElement;
 
     /**
      *
-     * When this constructor is used we assume the bone doesn't have an element.
-     *
      * @param relPivot The origin represented by 3 doubles in the form of a triple.
      * @param parentBone Parent of this bone
      * @param childrenBones All children direct child bones from this bone
+     * @param elements All elements that this bone represents
      * @param UUID UUID of this bone
      */
-    public Bone(Triple relPivot, Bone parentBone, List<Bone> childrenBones, String UUID) {
+    public Bone(Triple relPivot, Bone parentBone, Bone[] childrenBones, Element[] elements, String UUID) {
         this.relPivot = relPivot;
         this.UUID = UUID;
         this.childrenBones = childrenBones;
+        this.elements = elements;
         this.parentBone = parentBone;
         this.hasElement = false;
     }
 
-    /**
-     *
-     * When this constructor is used we assume the bone have an element.
-     *
-     * @param relPivot The origin represented by 3 doubles in the form of a triple.
-     * @param offset The origin represented by 3 doubles in the form of a triple.
-     * @param parentBone Parent of this bone
-     * @param childrenBones All children direct child bones from this bone
-     * @param UUID UUID of this bone
-     */
-    public Bone(Triple relPivot, Triple offset, Bone parentBone, List<Bone> childrenBones, String UUID) {
-        this.relPivot = relPivot;
-        this.UUID = UUID;
-        this.childrenBones = childrenBones;
-        this.parentBone = parentBone;
-        this.hasElement = true;
-        this.offset = offset;
-    }
-
     public void spawn(Triple originPosition, World world){
-        if(this.hasElement && this.itemDisplay == null){
-            Triple spawnPosition = new Triple(
-                    originPosition.x,
-                    originPosition.y,
-                    originPosition.z
-            );
-
-            //Spawn item display
-            this.itemDisplay = (ItemDisplay) world.spawnEntity(new Location(world, spawnPosition.x, spawnPosition.y, spawnPosition.z), EntityType.ITEM_DISPLAY);
-
-            ItemStack itemDisplayItem = new ItemStack(Material.DIAMOND_BLOCK);
-            //Set Custom Model Data
-            itemDisplayItem = CustomModelData.addCustomModelData(this.UUID, itemDisplayItem);
-            this.itemDisplay.setItemStack(itemDisplayItem);
+        for(int i = 0; i < this.elements.length; i++){
+            this.elements[i].spawn(originPosition, world);
         }
-        for(int i = 0; i < this.childrenBones.size(); i++){
-            this.childrenBones.get(i).spawn(originPosition, world);
+        for(int i = 0; i < this.childrenBones.length; i++){
+            this.childrenBones[i].spawn(originPosition, world);
         }
     }
 
@@ -105,16 +73,16 @@ public class Bone {
         this.UUID = UUID;
     }
 
-    public List<Bone> getChildrenBones() {
+    public Bone[] getChildrenBones() {
         return childrenBones;
     }
 
-    public void setChildrenBones(List<Bone> childrenBones) {
+    public void setChildrenBones(Bone[] childrenBones) {
         this.childrenBones = childrenBones;
     }
 
-    public void addChildrenBone(Bone childrenBone) {
-        this.childrenBones.add(childrenBone);
+    public void setChildrenBone(Bone[] childrenBone) {
+        this.childrenBones = childrenBone;
     }
 
     public Bone getParentBone() {
