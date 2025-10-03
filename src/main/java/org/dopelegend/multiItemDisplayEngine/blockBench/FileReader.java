@@ -98,7 +98,7 @@ public class FileReader {
             }
         }
 
-        Bone bone = null;
+        Bone bone;
         if(uuid == null){
             bone = new Bone(
                     new Triple(originArray.get(0).getAsDouble(), originArray.get(1).getAsDouble(),originArray.get(2).getAsDouble()),

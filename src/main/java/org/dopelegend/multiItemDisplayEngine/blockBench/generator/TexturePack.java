@@ -5,16 +5,12 @@ import it.unimi.dsi.fastutil.Pair;
 import org.bukkit.Bukkit;
 import org.dopelegend.multiItemDisplayEngine.MultiItemDisplayEngine;
 import org.dopelegend.multiItemDisplayEngine.files.utils.FileGetter;
-import org.dopelegend.multiItemDisplayEngine.utils.classes.Triple;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 public class TexturePack {
     private static File[] allModels = null;
@@ -178,10 +174,11 @@ public class TexturePack {
         }
         //Loop through all bones (one bone = one json file)
         for (Pair<JsonObject, JsonObject> boneAndJsonRootPair : allBones) {
-            JsonObject[] bbFileElements = getAllElementsFromBone(boneAndJsonRootPair.right(), boneAndJsonRootPair.left());
-            if(bbFileElements.length==0){
+            List<JsonObject> bbFileElements = getAllElementsFromBone(boneAndJsonRootPair.right(), boneAndJsonRootPair.left());
+            if(bbFileElements.isEmpty()){
                 continue;
             }
+
             //Get uuid
             String uuid = boneAndJsonRootPair.left().get("uuid").getAsString();
 
@@ -202,6 +199,8 @@ public class TexturePack {
             // textures
             JsonObject texturesObject = new JsonObject();
             texturesObject.addProperty("-1", "block/diamond_block");
+            // Add particle field (Minecraft will throw errors in the client log if this isn't present)
+            texturesObject.addProperty("particle", "block/diamond_block");
 
             JsonObject[] textures = getAllTexture(boneAndJsonRootPair.right());
 
@@ -245,6 +244,9 @@ public class TexturePack {
             // Make elements Array
             JsonArray elements = new JsonArray();
 
+            double fromX = bbFileElements.getFirst().get("from").getAsJsonArray().get(0).getAsDouble();
+            double fromY = bbFileElements.getFirst().get("from").getAsJsonArray().get(1).getAsDouble();
+            double fromZ = bbFileElements.getFirst().get("from").getAsJsonArray().get(2).getAsDouble();
             //Loop through all elements in bone
             for (JsonObject bbElement : bbFileElements) {
 
@@ -259,13 +261,13 @@ public class TexturePack {
                 JsonArray toArray = new JsonArray();
                 JsonArray fromArray = new JsonArray();
 
-                toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble());
-                toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble());
-                toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble());
+                toArray.add(bbElement.get("to").getAsJsonArray().get(0).getAsDouble()-fromX);
+                toArray.add(bbElement.get("to").getAsJsonArray().get(1).getAsDouble()-fromY);
+                toArray.add(bbElement.get("to").getAsJsonArray().get(2).getAsDouble()-fromZ);
 
-                fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble());
-                fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble());
-                fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble());
+                fromArray.add(bbElement.get("from").getAsJsonArray().get(0).getAsDouble()-fromX);
+                fromArray.add(bbElement.get("from").getAsJsonArray().get(1).getAsDouble()-fromY);
+                fromArray.add(bbElement.get("from").getAsJsonArray().get(2).getAsDouble()-fromZ);
 
                 //----------------------------------
 
@@ -424,7 +426,7 @@ public class TexturePack {
      *
      * @return A list of JsonObject or an empty list if none were found
      */
-    private static JsonObject[] getAllElementsFromBone(JsonObject modelData, JsonObject bone){
+    private static List<JsonObject> getAllElementsFromBone(JsonObject modelData, JsonObject bone){
         // get all elements in file
         JsonArray elementsArray = modelData.get("elements").getAsJsonArray();
         JsonObject[] elements = new JsonObject[elementsArray.size()];
@@ -447,7 +449,7 @@ public class TexturePack {
                 }
             }
         }
-        return outputElements.toArray(new JsonObject[0]);
+        return outputElements;
     }
 
 

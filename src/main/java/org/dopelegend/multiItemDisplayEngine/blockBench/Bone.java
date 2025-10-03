@@ -71,9 +71,9 @@ public class Bone {
     public void spawn(Triple originPosition, World world){
         if(this.hasElement && this.itemDisplay == null){
             Triple spawnPosition = new Triple(
-                    originPosition.x,
-                    originPosition.y,
-                    originPosition.z
+                    originPosition.x - (this.offset.x / 16),
+                    originPosition.y + (this.offset.y / 16),
+                    originPosition.z - (this.offset.z / 16)
             );
 
             //Spawn item display
